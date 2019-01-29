@@ -39,6 +39,7 @@
 
 let div;
 let min = new Point(0, 0), max, pos, speed = new Point(0, 0), half;
+let action = firstAction;
 
 function main() {
     div = document.getElementById("main");
@@ -52,11 +53,33 @@ function main() {
     requestAnimationFrame(onFrame);
 }
 
+function openFullscreen(elem) {
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) { /* Firefox */
+        elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE/Edge */
+        elem.msRequestFullscreen();
+    }
+}
+
+function onResize(e) {
+    max = new Point(window.innerWidth, window.innerHeight).sub(new Point(div.clientWidth, div.clientHeight));
+}
+
 function onFrame() {
     let style = div.style;
     style.top = `${pos.y}px`;
     style.left = `${pos.x}px`;
     requestAnimationFrame(onFrame);
+}
+
+function firstAction(x, y) {
+    action = actionDefault;
+    openFullscreen(document.body);
+    action(x, y);
 }
 
 function onClick(e) {
@@ -73,7 +96,7 @@ function onTouch(e) {
     action(x / n, y / n);
 }
 
-function action(x, y) {
+function actionDefault(x, y) {
     x -= half.x;
     y -= half.y;
     let delta = new Point(pos.x - x, pos.y - y);
@@ -101,6 +124,7 @@ function move() {
 }
 
 window.addEventListener("DOMContentLoaded", main);
+window.addEventListener("resize", onResize);
 window.addEventListener("click", onClick);
 window.addEventListener("touchstart", onTouch);
 window.addEventListener("touchmove", onTouch);
