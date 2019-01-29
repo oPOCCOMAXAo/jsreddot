@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Красная точка</title>
+</head>
+<script>class Point {
+    constructor(x, y) {
+        this.x = x || 0;
+        this.y = y || 0;
+    }
+
+    add(p) {
+        this.x += p.x;
+        this.y += p.y;
+        return this;
+    }
+
+    sub(p) {
+        this.x -= p.x;
+        this.y -= p.y;
+        return this;
+    }
+
+    mul(n) {
+        this.x *= n;
+        this.y *= n;
+        return this;
+    }
+
+    clone() {
+        return new Point(this.x, this.y);
+    }
+
+    vectorLength() {
+        return Math.hypot(this.x, this.y);
+    }
+}
+
+let div;
+let min = new Point(0, 0), max, pos, speed = new Point(0, 0), half;
+
+function main() {
+    div = document.getElementById("main");
+    max = new Point(window.innerWidth, window.innerHeight);
+    half = new Point(div.clientWidth, div.clientHeight);
+    pos = max.clone().sub(half).mul(0.5);
+    speed = half.clone().mul(Math.random() > 0.5 ? 1 : -1);
+    max.sub(half);
+    half.mul(0.5);
+    setInterval(move, 40);
+    requestAnimationFrame(onFrame);
+}
+
+function onFrame() {
+    let style = div.style;
+    style.top = `${pos.y}px`;
+    style.left = `${pos.x}px`;
+    requestAnimationFrame(onFrame);
+}
+
+function onClick(e) {
+    action(e.clientX, e.clientY);
+}
+
+function onTouch(e) {
+    let x = 0, y = 0, n = e.touches.length;
+    for (let i = 0; i < n; i++) {
+        let t = e.touches[i];
+        x += t.clientX;
+        y += t.clientY;
+    }
+    action(x / n, y / n);
+}
+
+function action(x, y) {
+    x -= half.x;
+    y -= half.y;
+    let delta = new Point(pos.x - x, pos.y - y);
+    delta.mul(2 * half.x / delta.vectorLength());
+    speed = delta;
+}
+
+function move() {
+    pos.add(speed);
+    speed.mul(0.99);
+    if (pos.x < min.x) {
+        pos.x = min.x;
+        speed.x = -speed.x;
+    } else if (pos.x > max.x) {
+        pos.x = max.x;
+        speed.x = -speed.x;
+    }
+    if (pos.y < min.y) {
+        pos.y = min.y;
+        speed.y = -speed.y;
+    } else if (pos.y > max.y) {
+        pos.y = max.y;
+        speed.y = -speed.y;
+    }
+}
+
+window.addEventListener("DOMContentLoaded", main);
+window.addEventListener("click", onClick);
+window.addEventListener("touchstart", onTouch);
+window.addEventListener("touchmove", onTouch);
+</script>
+<style>#main {
+    background: red;
+    position: absolute;
+    border-radius: 100%;
+    height: 1cm;
+    width: 1cm;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+}</style>
+<body>
+<div id="main"></div>
+</body>
+</html>
