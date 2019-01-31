@@ -68,11 +68,12 @@ function openFullscreen(elem) {
 function onResize(e) {
     max = new Point(window.innerWidth, window.innerHeight).sub(new Point(div.clientWidth, div.clientHeight));
 }
-
+let light = false;
 function onFrame() {
     let style = div.style;
     style.top = `${pos.y}px`;
     style.left = `${pos.x}px`;
+    style.background = (light = !light) ? "#f88" : "#f00";
     requestAnimationFrame(onFrame);
 }
 
@@ -130,7 +131,6 @@ window.addEventListener("touchstart", onTouch);
 window.addEventListener("touchmove", onTouch);
 </script>
 <style>#main {
-    background: red;
     position: absolute;
     border-radius: 100%;
     height: 1cm;
